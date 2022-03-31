@@ -1,37 +1,25 @@
 const express = require('express')
+const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
+const userRoutes = require('./routes/user-router')
 const app = express()
 
 mongoose.connect('mongodb+srv://P6Course:1234@hottakes.d5cp0.mongodb.net/HotTakes?retryWrites=true&w=majority',
   { useNewUrlParser: true,
     useUnifiedTopology: true })
-  .then(() => console.log('Connexion à MongoDB réussie !'))
-  .catch(() => console.log('Connexion à MongoDB échouée !'));
+  .then(() => console.log('Successfully logged in MongoDB !'))
+  .catch(() => console.log('Logging in MongoDB failed !'));
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*')
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization')
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
     next()
-  })
+  }
+)
 
-app.use((req, res, next) => {
-  console.log('Request received !')
-  next()
-})
+app.use(bodyParser.json())
 
-app.use((req, res, next) => {
-  res.status(201)
-  next()
-})
-
-app.use((req, res, next) => {
-  res.json({ message: 'Your request has been successfully received !' })
-  next()
-})
-
-app.use((req, res, next) => {
-  console.log('Response successfully sent !')
-})
+app.use('/api/auth', userRoutes)
 
 module.exports = app
