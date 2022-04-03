@@ -1,12 +1,14 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const userSchema = require('../schemas/user')
+require('dotenv').config({path: './environment/default.env'})
 
-const userScheme = require('../schemes/user')
+const tokenSalt = process.env.TOKENSALT
 
 const signup = async (req, res) => {
     try {
         const hash = await bcrypt.hash(req.body.password, 10)
-        const user = new userScheme({ 
+        const user = new userSchema({ 
             email: req.body.email,
             password: hash
         })
@@ -18,7 +20,7 @@ const signup = async (req, res) => {
 }
 
 const login = (req, res) => {
-    userScheme.findOne({ email : req.body.email })
+    userSchema.findOne({ email : req.body.email })
     .then(user => {
       if (!user) {
           return res.status(401).json({error: 'User not found'})
@@ -32,7 +34,8 @@ const login = (req, res) => {
                 userId : user._id,
                 token: jwt.sign(
                     { userId : user._id },
-                    'RANDOM_TOKEN_SECRET',
+                    //Transformer la string en variable d'environnement
+                    tokenSalt,
                     { expiresIn : '24h' }
                 )
             })
