@@ -34,7 +34,6 @@ const login = (req, res) => {
                 userId : user._id,
                 token: jwt.sign(
                     { userId : user._id },
-                    //Transformer la string en variable d'environnement
                     tokenSalt,
                     { expiresIn : '24h' }
                 )
