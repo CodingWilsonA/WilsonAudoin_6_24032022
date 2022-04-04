@@ -2,8 +2,8 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const userRoutes = require('./routes/user-router')
-require('dotenv').config({path: './environment/default.env'})
-
+const dotenv = require('dotenv')
+dotenv.config({path: './environment/default.env'})
 const app = express()
 const dataBaseUrl = process.env.DATABASE
 
