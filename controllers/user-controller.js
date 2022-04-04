@@ -1,8 +1,9 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const userSchema = require('../schemas/user')
-require('dotenv').config({path: './environment/default.env'})
+const dotenv = require('dotenv')
 
+dotenv.config({path: './environment/default.env'})
 const tokenSalt = process.env.TOKENSALT
 
 const signup = async (req, res) => {

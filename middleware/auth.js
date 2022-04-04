@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
-require('dotenv').config({path: './environment/default.env'})
+const dotenv = require('dotenv')
 
+dotenv.config({path: './environment/default.env'})
 const tokenSalt = process.env.TOKENSALT
 
 module.exports = (req, res, next) => {
