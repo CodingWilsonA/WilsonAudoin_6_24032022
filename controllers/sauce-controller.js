@@ -55,4 +55,43 @@ const deleteSauce = (req, res) => {
     })
     .catch(error => res.status(500).json({ error }))
 }
-module.exports = {getAllSauces, getOneSauce, createSauce, modifySauce, deleteSauce}
+
+const likeDislike = (req, res) => {
+    const userId = req.body.userId
+    const likeOrDislike = req.body.like
+    sauceSchema.findOne({ _id: req.params.id })
+    .then(sauce => {
+        const usersLikedArray = sauce.usersLiked
+        const usersDislikedArray = sauce.usersDisliked
+        switch (likeOrDislike) {
+            case 1:
+                sauce.likes += likeOrDislike
+                usersLikedArray.push(userId)
+                break
+            case -1:
+                sauce.dislikes += likeOrDislike
+                usersDislikedArray.push(userId)
+                break
+            case 0:
+                for (var id=0; id < usersLikedArray.length; id++) {
+                    if (usersLikedArray[id].match(userId)) {
+                        sauce.likes = sauce.likes - 1
+                        usersLikedArray.splice(id, 1)
+                    }
+                }
+                for (var id=0; id < usersDislikedArray.length; id++) {
+                    if (usersDislikedArray[id].match(userId)) {
+                        sauce.dislikes = sauce.dislikes + 1
+                        usersDislikedArray.splice(id, 1)
+                    }
+                }
+        }
+        console.log(sauce)
+        sauce.save()
+        .then(() => res.status(200).json({ message : 'Likes or dislikes successfully updated !'})) 
+        .catch(error => res.status(400).json({ error }))
+    })
+    .catch(error => res.status(500).json({ error }))
+}
+
+module.exports = {getAllSauces, getOneSauce, createSauce, modifySauce, deleteSauce, likeDislike}
