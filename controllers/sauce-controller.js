@@ -10,6 +10,7 @@ const getAllSauces = (req, res) => {
 
 //Reads one sauce once user clicked on it
 const getOneSauce = (req, res) => {
+    console.log(req.params)
     sauceSchema.findOne({
         _id: req.params.id
     })
@@ -56,6 +57,7 @@ const deleteSauce = (req, res) => {
     .catch(error => res.status(500).json({ error }))
 }
 
+//Updates likes or dislikes counters
 const likeDislike = (req, res) => {
     const userId = req.body.userId
     const likeOrDislike = req.body.like
