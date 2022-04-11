@@ -10,7 +10,6 @@ const getAllSauces = (req, res) => {
 
 //Reads one sauce once user clicked on it
 const getOneSauce = (req, res) => {
-    console.log(req.params)
     sauceSchema.findOne({
         _id: req.params.id
     })

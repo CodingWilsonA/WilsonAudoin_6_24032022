@@ -1,6 +1,8 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
+const helmet = require('helmet')
+const rateLimit = require('express-rate-limit')
 const userRoutes = require('./routes/user-router')
 const sauceRoutes = require('./routes/sauce-router')
 const dotenv = require('dotenv')
@@ -8,6 +10,12 @@ const path = require('path')
 dotenv.config({path: './environment/default.env'})
 const app = express()
 const dataBaseUrl = process.env.DATABASE
+const apiLimiter = rateLimit({
+	windowMs: 15 * 60 * 1000,
+	max: 100,
+	standardHeaders: true,
+	legacyHeaders: false,
+})
 
 mongoose.connect(dataBaseUrl,
   { useNewUrlParser: true,
@@ -24,6 +32,8 @@ app.use((req, res, next) => {
 )
 app.use(bodyParser.json())
 app.use('/images', express.static(path.join(__dirname, 'images')))
+app.use(helmet())
+app.use('/api', apiLimiter)
 app.use('/api/auth', userRoutes)
 app.use('/api/sauces', sauceRoutes)
 

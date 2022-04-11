@@ -2,14 +2,17 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const userSchema = require('../schemas/user')
 const dotenv = require('dotenv')
-
 dotenv.config({path: './environment/default.env'})
 const tokenSalt = process.env.TOKENSALT
+const sanitizeRegExp = /[<>"'`$]/gm
 
 const signup = async (req, res) => {
     const passwordRegExp = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/
     if(!passwordRegExp.test(req.body.password)) {
-        return res.status(401).json('Password should contain at least 8 characters including : one digit, one lower case and one upper case')
+        return res.status(401).json('Password should contain at least 8 alphanumerical characters including : one digit, one lower case and one upper case')
+    }
+    if (sanitizeRegExp.test(req.body.email)) {
+        return res.status(401).json('Email field contains a forbidden value')
     }
     try {
         const hash = await bcrypt.hash(req.body.password, 10)
@@ -25,6 +28,9 @@ const signup = async (req, res) => {
 }
 
 const login = (req, res) => {
+    if (sanitizeRegExp.test(req.body.email) || sanitizeRegExp.test(req.body.password)) {
+        return res.status(401).json('One of the fields contains a forbidden value')
+    }
     userSchema.findOne({ email : req.body.email })
     .then(user => {
       if (!user) {
