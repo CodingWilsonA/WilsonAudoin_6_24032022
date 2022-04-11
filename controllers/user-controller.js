@@ -7,6 +7,10 @@ dotenv.config({path: './environment/default.env'})
 const tokenSalt = process.env.TOKENSALT
 
 const signup = async (req, res) => {
+    const passwordRegExp = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/
+    if(!passwordRegExp.test(req.body.password)) {
+        return res.status(401).json('Password should contain at least 8 characters including : one digit, one lower case and one upper case')
+    }
     try {
         const hash = await bcrypt.hash(req.body.password, 10)
         const user = new userSchema({ 
@@ -16,7 +20,7 @@ const signup = async (req, res) => {
         await user.save()
         return res.status(201).json({ message : 'User successfully created !'})
     } catch (error) {
-    res.status(400).json({ error })
+        res.status(400).json({ error })
     }
 }
 
