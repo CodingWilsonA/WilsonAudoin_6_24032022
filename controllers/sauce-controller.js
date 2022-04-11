@@ -15,7 +15,7 @@ const getOneSauce = (req, res) => {
         _id: req.params.id
     })
     .then(sauce => {res.status(200).json(sauce)})
-    .catch(error => {res.status(400).json({ error })})
+    .catch(error => {res.status(404).json({ error })})
 }
 
 //Creates sauce in database
@@ -54,7 +54,7 @@ const deleteSauce = (req, res) => {
             .catch(error => res.status(400).json({ error }))
         })
     })
-    .catch(error => res.status(500).json({ error }))
+    .catch(error => res.status(404).json({ error }))
 }
 
 //Updates likes or dislikes counters
@@ -67,33 +67,32 @@ const likeDislike = (req, res) => {
         const usersDislikedArray = sauce.usersDisliked
         switch (likeOrDislike) {
             case 1:
-                sauce.likes += likeOrDislike
+                sauce.likes ++
                 usersLikedArray.push(userId)
                 break
             case -1:
-                sauce.dislikes += likeOrDislike
+                sauce.dislikes ++
                 usersDislikedArray.push(userId)
                 break
             case 0:
                 for (var id=0; id < usersLikedArray.length; id++) {
                     if (usersLikedArray[id].match(userId)) {
-                        sauce.likes = sauce.likes - 1
+                        sauce.likes = sauce.likes -1
                         usersLikedArray.splice(id, 1)
                     }
                 }
                 for (var id=0; id < usersDislikedArray.length; id++) {
                     if (usersDislikedArray[id].match(userId)) {
-                        sauce.dislikes = sauce.dislikes + 1
+                        sauce.dislikes = sauce.dislikes -1
                         usersDislikedArray.splice(id, 1)
                     }
                 }
         }
-        console.log(sauce)
         sauce.save()
         .then(() => res.status(200).json({ message : 'Likes or dislikes successfully updated !'})) 
         .catch(error => res.status(400).json({ error }))
     })
-    .catch(error => res.status(500).json({ error }))
+    .catch(error => res.status(404).json({ error }))
 }
 
 module.exports = {getAllSauces, getOneSauce, createSauce, modifySauce, deleteSauce, likeDislike}
