@@ -2,13 +2,18 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const userRoutes = require('./routes/user-router')
+const sauceRoutes = require('./routes/sauce-router')
+const dotenv = require('dotenv')
+const path = require('path')
+dotenv.config({path: './environment/default.env'})
 const app = express()
+const dataBaseUrl = process.env.DATABASE
 
-mongoose.connect('mongodb+srv://P6Course:1234@hottakes.d5cp0.mongodb.net/HotTakes?retryWrites=true&w=majority',
+mongoose.connect(dataBaseUrl,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Successfully logged in MongoDB !'))
-  .catch(() => console.log('Logging in MongoDB failed !'));
+  .catch(() => console.log('Logging in MongoDB failed !'))
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*')
@@ -17,9 +22,9 @@ app.use((req, res, next) => {
     next()
   }
 )
-
 app.use(bodyParser.json())
-
+app.use('/images', express.static(path.join(__dirname, 'images')))
 app.use('/api/auth', userRoutes)
+app.use('/api/sauces', sauceRoutes)
 
 module.exports = app
