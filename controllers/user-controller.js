@@ -1,24 +1,31 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const userSchema = require('../schemas/user')
+const dotenv = require('dotenv')
 
-const userScheme = require('../schemes/user')
+dotenv.config({path: './environment/default.env'})
+const tokenSalt = process.env.TOKENSALT
 
 const signup = async (req, res) => {
+    const passwordRegExp = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/
+    if(!passwordRegExp.test(req.body.password)) {
+        return res.status(401).json('Password should contain at least 8 characters including : one digit, one lower case and one upper case')
+    }
     try {
         const hash = await bcrypt.hash(req.body.password, 10)
-        const user = new userScheme({ 
+        const user = new userSchema({ 
             email: req.body.email,
             password: hash
         })
         await user.save()
         return res.status(201).json({ message : 'User successfully created !'})
     } catch (error) {
-    res.status(400).json({ message : 'Could not create user !' })
+        res.status(400).json({ error })
     }
 }
 
 const login = (req, res) => {
-    userScheme.findOne({ email : req.body.email })
+    userSchema.findOne({ email : req.body.email })
     .then(user => {
       if (!user) {
           return res.status(401).json({error: 'User not found'})
@@ -32,7 +39,7 @@ const login = (req, res) => {
                 userId : user._id,
                 token: jwt.sign(
                     { userId : user._id },
-                    'RANDOM_TOKEN_SECRET',
+                    tokenSalt,
                     { expiresIn : '24h' }
                 )
             })
