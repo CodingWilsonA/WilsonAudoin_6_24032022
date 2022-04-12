@@ -33,7 +33,7 @@ app.use((req, res, next) => {
 app.use(bodyParser.json())
 app.use('/images', express.static(path.join(__dirname, 'images')))
 app.use(helmet())
-app.use('/api', apiLimiter)
+app.use('/api/auth/login', apiLimiter)
 app.use('/api/auth', userRoutes)
 app.use('/api/sauces', sauceRoutes)
 
