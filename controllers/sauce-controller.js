@@ -66,12 +66,10 @@ const likeDislike = (req, res) => {
         const usersDislikedArray = sauce.usersDisliked
         switch (likeOrDislike) {
             case 1:
-                sauce.likes ++
-                usersLikedArray.push(userId)
+                addCountToObject(userId, sauce.likes, usersLikedArray)
                 break
             case -1:
-                sauce.dislikes ++
-                usersDislikedArray.push(userId)
+                addCountToObject(userId, sauce.dislikes, usersDislikedArray)
                 break
             case 0:
                 for (var id=0; id < usersLikedArray.length; id++) {
@@ -86,12 +84,21 @@ const likeDislike = (req, res) => {
                         usersDislikedArray.splice(id, 1)
                     }
                 }
+                break
+            default:
+                return res.status(400).json({ error : 'Value can only be on of the following: 0, 1, -1'})
         }
         sauce.save()
         .then(() => res.status(200).json({ message : 'Likes or dislikes successfully updated !'})) 
         .catch(error => res.status(400).json({ error }))
     })
     .catch(error => res.status(404).json({ error }))
+}
+
+//This function is used to add count sent by user action and their id to respective array
+function addCountToObject(userId, saucekey, idList){
+    saucekey += 1
+    idList.push(userId)
 }
 
 module.exports = {getAllSauces, getOneSauce, createSauce, modifySauce, deleteSauce, likeDislike}
